@@ -2,8 +2,8 @@
   (require
     [clojure.java.jmx :as jmx]
     [moniclo.logging]
+    [moniclo.monitor :as monitor]
     [taoensso.timbre :as timbre]
-    [cheshire.core :refer :all ]
     [clojure.string :as string]
     [clojure.tools.cli :refer [parse-opts]]
     )
@@ -24,7 +24,7 @@
    ["-h" "--help"]])
 
 (defn usage [options-summary]
-  (->> ["This is my program. There are many like it, but this one is mine."
+  (->> ["MoniClo. A JMX MBean monitor implemented in Clojure."
         ""
         "Usage: program-name [options]"
         ""
@@ -40,24 +40,13 @@
   (println msg)
   (System/exit status))
 
-(defn monitor
-  [jmx-server jmx-port]
-  (info "Querying JMX server running at " jmx-server ":" jmx-port "...")
-  (jmx/with-connection {:host jmx-server, :port jmx-port}
-    (let [permGenUsage (:Usage (jmx/mbean "java.lang:type=MemoryPool,name=Perm Gen"))
-          heapUsage (:HeapMemoryUsage (jmx/mbean "java.lang:type=Memory"))]
-      (generate-string {:heap {:used (:used heapUsage)
-                               :free (= (:max heapUsage) (:used heapUsage))}
-                        :permGen {:used (:used permGenUsage)
-                                  :free (- (:max permGenUsage) (:used permGenUsage))}}))))
-
 (defn -main
   "Return monitoring values from a specified JMX server"
   [& args]
   (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
     (cond
       (:help options) (exit 0 (usage summary))
-      (not= (count arguments) 1) (exit 1 (usage summary))
+      (not= (count options) 2) (exit 1 (usage summary))
       errors (exit 1 (error-msg errors)))
-    (monitor "localhost" 1099)))
+    (monitor/monitor (.getHostAddress (:hostname options)) (:port options))))
 
