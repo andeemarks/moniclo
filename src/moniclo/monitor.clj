@@ -4,7 +4,6 @@
     [taoensso.timbre :as timbre]
     [cheshire.core :refer :all ]
     [clojure.string :as string]
-    [clojure.tools.cli :refer [parse-opts]]
     )
   (:gen-class ))
 

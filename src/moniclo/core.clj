@@ -1,6 +1,5 @@
 (ns moniclo.core
   (require
-    [clojure.java.jmx :as jmx]
     [moniclo.logging]
     [moniclo.monitor :as monitor]
     [taoensso.timbre :as timbre]
