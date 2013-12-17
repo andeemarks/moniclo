@@ -16,6 +16,6 @@
     (let [permGenUsage (:Usage (jmx/mbean "java.lang:type=MemoryPool,name=Perm Gen"))
           heapUsage (:HeapMemoryUsage (jmx/mbean "java.lang:type=Memory"))]
       (generate-string {:heap {:used (:used heapUsage)
-                               :free (= (:max heapUsage) (:used heapUsage))}
+                               :free (- (:max heapUsage) (:used heapUsage))}
                         :permGen {:used (:used permGenUsage)
                                   :free (- (:max permGenUsage) (:used permGenUsage))}}))))
